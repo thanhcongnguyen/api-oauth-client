@@ -33,8 +33,10 @@ export class PostController{
 
     share(req, res, next){
         const { id } = req.body;
+        const {accessToken} = req.headers['authorization'];
         return post.share({
-            id
+            id,
+            accessToken
         }).then( () => {
             res.status(200).send({
 				status: true

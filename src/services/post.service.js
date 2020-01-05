@@ -1,9 +1,24 @@
 import _ from 'lodash';
 import db from '../../models';
-import { ValidationError } from '../middlewares/errors';
+import { ValidationError, AuthorizationError } from '../middlewares/errors';
+import { OauthClient } from '../libraries/oauthClient';
 
 export class PostService{
-    create({ content, title, thumbnail}){
+    create({ content, title, thumbnail, accessToken }){
+
+        if(!accessToken){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            });
+        }
+
+        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk');
+        if(!decoded){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            });
+        }
+
         if(!content){
             throw new ValidationError({
                 error: 'invalid_request'
@@ -12,29 +27,53 @@ export class PostService{
         return db.Post.create({
                 content,
                 title,
-                thumbnail
+                thumbnail,
+                user_id: decoded.user_id
         });  
     }
 
-    delete({ id }){
+    delete({ id, accessToken }){
+
+        if(!accessToken){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            });
+        }
+
         if(!id){
             throw new ValidationError({
                 error: 'invalid_request'
             });
         }
+
+        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk');
+        if(!decoded){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            });
+        }
+
         return db.Post.destroy({
             where: {
-               id 
+               id
             }
         });
     }
 
-    share({ id }){
+    share({ id, accessToken }){
+
+        if(!accessToken){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            });
+        }
+
         if(!id){
             throw new ValidationError({
                 error: 'invalid_request'
             });
         }
+
         return db.Post.findOne({
             where: { id }
         }).then( post => {
@@ -43,11 +82,19 @@ export class PostService{
                     error: 'post find not found!'
                 });
             }
-            console.log('post', post);
-        })
+            return OauthClient.sharePost({
+                accessToken,
+                content: post.content
+            });
+        });
     }
 
-    getPosts(){
+    getPosts({ accessToken }){
+        if(!accessToken){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            });
+        }
         return db.Post.findAll();
     }
 }
