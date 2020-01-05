@@ -24,7 +24,8 @@ export class PostController{
         const { id } = req. body;
         const accessToken = req.headers['authorization'];
         return post.delete({
-            id
+            id,
+            accessToken
         }).then( () => {
             res.status(200).send({
 				status: true

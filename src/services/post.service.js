@@ -34,11 +34,17 @@ export class PostService{
     }
 
     delete({ id, accessToken }){
-
         if(!accessToken){
             throw new AuthorizationError({
                 error: 'invalid access_token'
             });
+        }
+
+        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk.vn')
+        if(!decoded){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            })
         }
 
         if(!id){
@@ -47,16 +53,10 @@ export class PostService{
             });
         }
 
-        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk');
-        if(!decoded){
-            throw new AuthorizationError({
-                error: 'invalid access_token'
-            });
-        }
-
         return db.Post.destroy({
             where: {
-               id
+               id,
+               created_by: `${decoded.user_id}`
             }
         });
     }
@@ -69,6 +69,13 @@ export class PostService{
             });
         }
 
+        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk.vn')
+        if(!decoded){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            })
+        }
+
         if(!id){
             throw new ValidationError({
                 error: 'invalid_request'
@@ -76,7 +83,10 @@ export class PostService{
         }
 
         return db.Post.findOne({
-            where: { id }
+            where: { 
+                id,
+                created_by: `${decoded.user_id}`
+            }
         }).then( post => {
             if(!post){
                 throw new ValidationError({
@@ -104,7 +114,7 @@ export class PostService{
                 error: 'invalid access_token'
             })
         }
-        
+
         return db.Post.findAll({
             where: {
                 created_by: `${decoded.user_id}`
