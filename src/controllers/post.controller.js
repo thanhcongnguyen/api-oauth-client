@@ -8,9 +8,9 @@ export class PostController{
             content,
             title,
             thumbnail
-        }).then( post => {
+        }).then( postRes => {
             res.status(200).send({
-                data: post,
+                data: postRes,
 				status: true
 			});
         }).catch( err => {
