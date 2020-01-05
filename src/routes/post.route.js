@@ -14,7 +14,7 @@ const post = new PostController();
 
 // router.post('/create', post.create);
 router.post('/create', post.create);
-router.delete('/delete', post.delete);
+router.post('/delete', post.delete);
 router.post('/share', post.share);
 router.get('/all', post.getPosts);
 router.use(errorMiddleware);
