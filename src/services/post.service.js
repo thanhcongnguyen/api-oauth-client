@@ -118,7 +118,10 @@ export class PostService{
         return db.Post.findAll({
             where: {
                 created_by: `${decoded.user_id}`
-            }
+            },
+            order: [
+                ['id', 'DESC']
+            ],
         });
     }
 }
