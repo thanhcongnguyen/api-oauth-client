@@ -19,11 +19,13 @@ export class OauthClient{
 
     static verifyJWT(jwtString, secretKey){
         let decoded = null;
+        
         try {
+            
             decoded = jwt.verify(jwtString, secretKey);
         } catch(err) {
             throw new AuthorizationError({
-                error: 'invalid access_token'
+                error: err.message
             });
         }
         return decoded;

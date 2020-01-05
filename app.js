@@ -7,7 +7,8 @@ const path = require('path');
 var cors = require('cors');
 
 //import routes
-const indexRouter = require('./src/routes/index.route');
+const userRoute = require('./src/routes/user.route');
+const postRouter = require('./src/routes/post.route');
 
 app.use(express.static(path.resolve('./uploads')));
 app.use(logger('dev'));
@@ -18,5 +19,9 @@ app.use(cors());
 
 
 //use routes
-app.use('/api', indexRouter);
+app.use('/api/post', postRouter);
+app.use('/api/user', userRoute);
+app.post('/api/test', (req, res) => {
+    console.log('req', req.body)
+})
 module.exports = app;

@@ -12,7 +12,8 @@ export class PostService{
             });
         }
 
-        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk');
+        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk.vn')
+        console.log('decoded', decoded);
         if(!decoded){
             throw new AuthorizationError({
                 error: 'invalid access_token'
@@ -28,7 +29,7 @@ export class PostService{
                 content,
                 title,
                 thumbnail,
-                user_id: decoded.user_id
+                created_by: decoded.user_id
         });  
     }
 
@@ -89,13 +90,26 @@ export class PostService{
         });
     }
 
+
     getPosts({ accessToken }){
         if(!accessToken){
             throw new AuthorizationError({
                 error: 'invalid access_token'
             });
         }
-        return db.Post.findAll();
+
+        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk.vn')
+        if(!decoded){
+            throw new AuthorizationError({
+                error: 'invalid access_token'
+            })
+        }
+        
+        return db.Post.findAll({
+            where: {
+                created_by: `${decoded.user_id}`
+            }
+        });
     }
 }
 

@@ -4,10 +4,12 @@ const post = new PostService();
 export class PostController{
     create(req, res, next){
         const { content, title, thumbnail } = req.body;
+        const accessToken = req.headers['authorization'];
         return post.create({
             content,
             title,
-            thumbnail
+            thumbnail,
+            accessToken
         }).then( postRes => {
             res.status(200).send({
                 data: postRes,
@@ -20,6 +22,7 @@ export class PostController{
 
     delete(req, res, next){
         const { id } = req. body;
+        const accessToken = req.headers['authorization'];
         return post.delete({
             id
         }).then( () => {
@@ -32,23 +35,26 @@ export class PostController{
     }
 
     share(req, res, next){
-        const { id } = req.body;
-        const {accessToken} = req.headers['authorization'];
-        return post.share({
-            id,
-            accessToken
-        }).then( () => {
-            res.status(200).send({
-				status: true
-			});
-        }).catch( err => {
-            next(err);
-        })
+        // const { id } = req.body;
+        // const {accessToken} = req.headers['authorization'];
+        // return post.share({
+        //     id,
+        //     accessToken
+        // }).then( () => {
+        //     res.status(200).send({
+		// 		status: true
+		// 	});
+        // }).catch( err => {
+        //     next(err);
+        // })
     }
 
     getPosts(req, res, next){
-        return post.getPosts()
-        .then( posts => {
+        const accessToken = req.headers['authorization'];
+        console.log('accessToken', accessToken);
+        return post.getPosts({
+            accessToken
+        }).then( posts => {
             res.status(200).send({
                 data: posts,
 				status: true

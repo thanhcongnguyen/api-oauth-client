@@ -12,6 +12,7 @@ import {
 } from '../controllers/post.controller';
 const post = new PostController();
 
+// router.post('/create', post.create);
 router.post('/create', post.create);
 router.post('/delete', post.delete);
 router.post('/share', post.share);
