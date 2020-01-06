@@ -4,6 +4,7 @@ import { ValidationError, AuthorizationError } from '../middlewares/errors';
 import { OauthClient } from '../libraries/oauthClient';
 
 export class PostService{
+    
     create({ content, title, thumbnail, accessToken }){
 
         if(!accessToken){
@@ -60,46 +61,6 @@ export class PostService{
             }
         });
     }
-
-    share({ id, accessToken }){
-
-        if(!accessToken){
-            throw new AuthorizationError({
-                error: 'invalid access_token'
-            });
-        }
-
-        let decoded = OauthClient.verifyJWT(accessToken, 'wecantalk.vn')
-        if(!decoded){
-            throw new AuthorizationError({
-                error: 'invalid access_token'
-            })
-        }
-
-        if(!id){
-            throw new ValidationError({
-                error: 'invalid_request'
-            });
-        }
-
-        return db.Post.findOne({
-            where: { 
-                id,
-                created_by: `${decoded.user_id}`
-            }
-        }).then( post => {
-            if(!post){
-                throw new ValidationError({
-                    error: 'post find not found!'
-                });
-            }
-            return OauthClient.sharePost({
-                accessToken,
-                content: post.content
-            });
-        });
-    }
-
 
     getPosts({ accessToken }){
         if(!accessToken){
